@@ -11,9 +11,9 @@ export const createUser = async (userData: UserInput) => {
     })
 };
 
-export async function findUser(query: any){
-    const user = await User.findOne({...query});
-   if(!query || !user) return false;
+export async function findUser(email: UserInput["email"]){
+    const user = await User.findOne({email});
+   if(!email || !user) return false;
 
    return user;
 }

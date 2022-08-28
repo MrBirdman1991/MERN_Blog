@@ -29,14 +29,14 @@ const userInput = {
 
 
 it("should return false if user not exists", async () => {
-  const existingUser = await findUser({ email: userInput.email });
+  const existingUser = await findUser( userInput.email );
 
   expect(existingUser).toBe(false);
 });
 
 it("should return an user if exists", async () => {
   const createdUser = await createUser({ ...userInput });
-  const existingUser = await findUser({ email: userInput.email });
+  const existingUser = await findUser(userInput.email );
 
   // @ts-ignore
   expect(createdUser.email).toBe(existingUser.email);

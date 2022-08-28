@@ -55,4 +55,9 @@ it("should create user in inactive mode", async () => {
   expect(createdUser.status).toBe(0);
 });
 
+it("should create an user with ips array length of one", async () => {
+  const createdUser = await createUser({ ...userInput });
+
+  expect(createdUser.ips.length).toBe(1);
+})
 
