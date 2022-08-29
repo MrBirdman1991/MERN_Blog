@@ -1,5 +1,6 @@
 import {Request, Response, NextFunction} from "express"
-import { createUser, findUser } from "../services/user.service";
+import { createUser, deleteUser, findUser, sendConfirmationMail } from "../services/user.service";
+import logger from "../utils/logger";
 
 export const signUpHandler = async(req: Request, res: Response, next: NextFunction) => {
     try{
@@ -12,8 +13,17 @@ export const signUpHandler = async(req: Request, res: Response, next: NextFuncti
 
         const createdUser = await createUser({email, password, userAgent, clientIp});
 
+        const isSended = await sendConfirmationMail(createdUser);
+        
+        if(!isSended){
+          await deleteUser(createdUser);
+          throw new Error();
+        }
+        
+
         res.status(201).send(createdUser)
-    }catch(err){
+    }catch(err: any){
+        logger.error(err.message);
         res.status(500).json("an unknown error occoured")
     }
 }
