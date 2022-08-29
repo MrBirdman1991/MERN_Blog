@@ -1,6 +1,7 @@
 import mongoose, { Schema, Document } from "mongoose";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
+import Mailer from "../utils/Mailer";
 
 enum UserStatus {
   inactive = 0,
@@ -29,9 +30,9 @@ const userSchema = new Schema(
     email: { type: String, required: true },
     password: { type: String, required: true },
     userAgent: { type: String },
-    status: {type: Number, default: 0},
+    status: { type: Number, default: 0 },
     ips: [{ type: String, default: [] }],
-    activationToken: {type: String, default: ""}
+    activationToken: { type: String, default: "" },
   },
   {
     timestamps: true,
@@ -40,12 +41,21 @@ const userSchema = new Schema(
 
 userSchema.pre("save", async function (next) {
   const user = this;
+  const transporter = Mailer.getInstance();
 
   const salt = await bcrypt.genSalt(12);
   user.password = await bcrypt.hash(user.password, salt);
 
   const activationToken = crypto.randomBytes(64).toString("hex");
   user.activationToken = activationToken;
+
+  const url = `${process.env.CLIENT_URI}/?token=${user.activationToken}`;
+  await transporter.sendMail({
+    from: '"Fred Foo 👻" <foo@example.com>',
+    to: user.email,
+    subject: "Blog registration",
+    html: `Bitte auf confirm klicken <a href="${url}">confirm</<a>`,
+  });
 
   next();
 });

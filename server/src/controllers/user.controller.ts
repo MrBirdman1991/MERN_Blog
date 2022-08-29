@@ -1,5 +1,5 @@
 import {Request, Response, NextFunction} from "express"
-import { createUser, deleteUser, findUser, sendConfirmationMail } from "../services/user.service";
+import { createUser, findUser } from "../services/user.service";
 import logger from "../utils/logger";
 
 export const signUpHandler = async(req: Request, res: Response, next: NextFunction) => {
@@ -12,15 +12,7 @@ export const signUpHandler = async(req: Request, res: Response, next: NextFuncti
         if(isExistingUser) return res.status(422).json("user already exists");
 
         const createdUser = await createUser({email, password, userAgent, clientIp});
-
-        const isSended = await sendConfirmationMail(createdUser);
         
-        if(!isSended){
-          await deleteUser(createdUser);
-          throw new Error();
-        }
-        
-
         res.status(201).send(createdUser)
     }catch(err: any){
         logger.error(err.message);
