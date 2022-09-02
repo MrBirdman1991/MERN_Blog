@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document } from "mongoose";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
-import Mailer from "../utils/Mailer";
+import createTransporter from "../utils/mailerTransporter";
 
 enum UserStatus {
   inactive = 0,
@@ -41,7 +41,15 @@ const userSchema = new Schema(
 
 userSchema.pre("save", async function (next) {
   const user = this;
-  const transporter = Mailer.getInstance();
+
+  const transporter = createTransporter({
+    // @ts-ignore
+    service: process.env.Mailer_SERVICE,
+    auth: {
+      user: process.env.Mailer_USER,
+      pass: process.env.Mailer_PASS,
+    },
+  });
 
   const salt = await bcrypt.genSalt(12);
   user.password = await bcrypt.hash(user.password, salt);
