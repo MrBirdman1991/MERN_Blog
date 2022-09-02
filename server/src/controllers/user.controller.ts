@@ -13,7 +13,7 @@ export const signUpHandler = async(req: Request, res: Response, next: NextFuncti
 
         const createdUser = await createUser({email, password, userAgent, clientIp});
         
-        res.status(201).send(createdUser)
+        res.status(201).json(createdUser)
     }catch(err: any){
         logger.error(err.message);
         res.status(500).json("an unknown error occoured")
