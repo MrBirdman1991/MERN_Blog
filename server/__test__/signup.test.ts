@@ -46,13 +46,13 @@ describe("given the user input exist", () => {
   };
   const next = vi.fn();
 
-  it("should call findUser service with email param once", () => {
+  it("should call findUser service with email param once", async () => {
     const findUserServiceMock = vi
       .spyOn(UserService, "findUser")
       .mockReturnValueOnce(Promise.resolve(false));
 
     // @ts-ignore
-    signUpHandler(req, res, next);
+    await signUpHandler(req, res, next);
 
     expect(findUserServiceMock).toBeCalledTimes(1);
     expect(findUserServiceMock).toHaveBeenCalledWith(req.body.email);
@@ -63,11 +63,36 @@ describe("given the user input exist", () => {
       // @ts-ignore
       .mockReturnValueOnce(Promise.resolve({ ...userPayload }));
 
-    const { statusCode} = await request(app)
+    const { statusCode } = await request(app)
       .post(ROUTE_SIGNUP)
       .send({ ...req.body });
 
-    expect(statusCode).toBe(422)
-    
+    expect(statusCode).toBe(422);
+  });
+
+  it("should throw 500 status if findUser throws", async () => {
+    // @ts-ignore
+    vi.spyOn(UserService, "findUser").mockRejectedValueOnce("unknown Error");
+
+    const { statusCode } = await request(app)
+      .post(ROUTE_SIGNUP)
+      .send({ ...req.body });
+
+    expect(statusCode).toBe(500);
+  });
+
+  it("should call createUser once if user not exists", async () => {
+    // @ts-ignore
+    UserService.findUser.mockImplementationOnce(() => Promise.resolve(false));
+
+    const createUserServiceMock = vi
+      .spyOn(UserService, "createUser")
+      // @ts-ignore
+      .mockResolvedValueOnce(Promise.resolve({ ...userPayload }));
+
+    // @ts-ignore
+    await signUpHandler(req, res, next);
+
+    expect(createUserServiceMock).toBeCalledTimes(1);
   });
 });

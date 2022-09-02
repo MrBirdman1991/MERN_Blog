@@ -1,5 +1,5 @@
 import User, {  UserInput } from "../models/user.model";
-import Mailer from "../utils/Mailer"
+
 
 
 export const createUser = async (userData: UserInput) => {
