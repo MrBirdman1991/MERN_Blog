@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import request from "supertest";
 import mongoose from "mongoose";
-import Request from "express";
 
 import { createServer } from "../src/utils/server";
 import * as UserService from "../src/services/user.service";
@@ -55,7 +54,7 @@ describe("given the user input exist", () => {
     await signUpHandler(req, res, next);
 
     expect(findUserServiceMock).toBeCalledTimes(1);
-    expect(findUserServiceMock).toHaveBeenCalledWith(req.body.email);
+    expect(findUserServiceMock).toHaveBeenCalledWith({email: req.body.email});
   });
 
   it("should throw 422 status if user already exists in db", async () => {
@@ -162,3 +161,5 @@ describe("given the user input doesn't exist", () => {
     }
   );
 });
+
+

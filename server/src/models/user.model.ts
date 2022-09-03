@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import crypto from "crypto";
 import createTransporter from "../utils/mailerTransporter";
 
-enum UserStatus {
+export enum UserStatus {
   inactive = 0,
   active = 1,
   blocked = 2,
@@ -57,7 +57,7 @@ userSchema.pre("save", async function (next) {
   const activationToken = crypto.randomBytes(64).toString("hex");
   user.activationToken = activationToken;
 
-  const url = `${process.env.CLIENT_URI}/?token=${user.activationToken}`;
+  const url = `${process.env.CLIENT_URI}/${user.activationToken}`;
   await transporter.sendMail({
     from: '"Fred Foo 👻" <foo@example.com>',
     to: user.email,
