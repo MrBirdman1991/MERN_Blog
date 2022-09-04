@@ -1,4 +1,4 @@
-import { it, expect, vi, afterEach, beforeAll } from "vitest";
+import { it, expect, vi, afterEach } from "vitest";
 import request from "supertest";
 import mongoose from "mongoose";
 
@@ -17,16 +17,13 @@ const userPayload = {
   email: "bernadette.vogel@web.de",
   password: "$2b$12$4RUurNhh4x9eK5gEn48faeocU61lcPILZ0wAk6vP1YSB4lAwRSg/y",
   userAgent: "PostmanRuntime/7.29.2",
-  activationToken:
-    "8d45a26add30c9c77c7da6bc8d5501b6106fcb3576d9a9865f717c9fc01ea409d1b00a5a7769f8d593124431a97e9e65da49108a92eec595b110155a841be38d",
-  status: 0,
+  activationToken: "",
+  status: 1,
   ips: ["::ffff:127.0.0.1"],
   createdAt: "2022-08-28T20:15:38.683Z",
   updatedAt: "2022-08-28T20:15:38.683Z",
   __v: 0,
 };
-
-const ROUTE_ACTIVATE = `/api/user/1.0/activate/${userPayload.activationToken}`;
 
 const req = {
   params: {
@@ -41,32 +38,32 @@ const res = {
 };
 const next = vi.fn();
 
-it("should call find user with url param once", async () => {
+const ROUTE_ACTIVATE = `/api/user/1.0/activate/${req.params.token}`;
+
+it("should call activateUser with url param once", async () => {
   const findUserServiceMock = vi
-    .spyOn(UserService, "findUser")
-    .mockReturnValueOnce(Promise.resolve(false));
+    .spyOn(UserService, "activateUser")
+    .mockReturnValueOnce(Promise.resolve({ ...userPayload }));
 
   // @ts-ignore
   await activateUserHandler(req, res, next);
 
   expect(findUserServiceMock).toBeCalledTimes(1);
-  expect(findUserServiceMock).toHaveBeenCalledWith({
-    activationToken: req.params.token,
-  });
+  expect(findUserServiceMock).toHaveBeenCalledWith(req.params.token);
 });
 
-it("should throw 500 status if findUser throws", async () => {
-  // @ts-ignore
-  vi.spyOn(UserService, "findUser").mockRejectedValueOnce("unknown Error");
+it("should throw 500 status if activateUser throws", async () => {
+  //@ts-ignore
+  vi.spyOn(UserService, "activateUser").mockRejectedValueOnce("unknown Error");
 
-  const { statusCode } = await request(app).get(ROUTE_ACTIVATE);
+  const { statusCode } = await request(app).get(ROUTE_ACTIVATE).send();
 
   expect(statusCode).toBe(500);
 });
 
 it("should return 404 status if no user is found", async () => {
   // @ts-ignore
-  vi.spyOn(UserService, "findUser")
+  vi.spyOn(UserService, "activateUser")
     // @ts-ignore
     .mockReturnValueOnce(Promise.resolve(false));
 
@@ -75,51 +72,30 @@ it("should return 404 status if no user is found", async () => {
   expect(statusCode).toBe(404);
 });
 
-it("should call updateUser once with user and query", async () => {
-  // @ts-ignore
-  UserService.findUser.mockImplementationOnce(() =>
-    Promise.resolve({ ...userPayload })
-  );
-
-  const updateUserServiceMock = vi
-    .spyOn(UserService, "updateUser")
-    // @ts-ignore
-    .mockReturnValueOnce({});
-
-  // @ts-ignore
-  await activateUserHandler(req, res, next);
-
-  expect(updateUserServiceMock).toBeCalledTimes(1);
-  expect(updateUserServiceMock).toBeCalledWith(userPayload, {
-    $set: { status: 1 },
-  });
-});
-
-it("should throw 500 status if updateUser throws", async () => {
-  // @ts-ignore
-  UserService.findUser.mockImplementationOnce(() =>
-    Promise.resolve({ ...userPayload })
-  );
-
-  // @ts-ignore
-  vi.spyOn(UserService, "updateUser").mockRejectedValueOnce("unknown Error");
-
-  const { statusCode } = await request(app).get(ROUTE_ACTIVATE);
-
-  expect(statusCode).toBe(500);
-});
 
 it("should return 202 status if user updated", async() => {
   // @ts-ignore
-  UserService.findUser.mockImplementationOnce(() =>
-    Promise.resolve({ ...userPayload })
-  );
-
-  vi.spyOn(UserService, "updateUser")
+  vi.spyOn(UserService, "activateUser")
     // @ts-ignore
-    .mockReturnValueOnce({});
+    .mockReturnValueOnce(Promise.resolve({...userPayload}));
 
-  const { statusCode } = await request(app).get(ROUTE_ACTIVATE);
+
+  const { statusCode, body } = await request(app).get(ROUTE_ACTIVATE);
+
 
   expect(statusCode).toBe(202)
 });
+
+it("should return activation token of '' and status of 1 if update succeded", async() => {
+  // @ts-ignore
+  vi.spyOn(UserService, "activateUser")
+    // @ts-ignore
+    .mockReturnValueOnce(Promise.resolve({...userPayload}));
+
+
+  const {  body } = await request(app).get(ROUTE_ACTIVATE);
+
+
+  expect(body.activationToken).toBe('');
+  expect(body.status).toBe(1);
+})

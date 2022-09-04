@@ -1,5 +1,4 @@
-import { UserStatus } from "../models/user.model";
-import { createUser, findUser, updateUser } from "../services/user.service";
+import { createUser, findUser, activateUser } from "../services/user.service";
 import { withErrorHandler } from "../utils/withErrorHandler";
 
 export const signUpHandler = withErrorHandler( async (req, res, next) => {
@@ -18,10 +17,10 @@ export const signUpHandler = withErrorHandler( async (req, res, next) => {
 
 export const activateUserHandler = withErrorHandler(async (req, res, next) => {
     const token = req.params.token
-    const isExistingUser = await findUser({activationToken: req.params.token});
-    if(!token || !isExistingUser) return res.status(404).json("user not found");
 
-    await updateUser(isExistingUser, { $set:{ "status" : UserStatus.active }})
+    const updatedUser = await activateUser(token);
 
-    res.status(202).json("User Updated")
+    if(!updatedUser) return res.status(404).json("no user found");
+
+    res.status(202).json(updatedUser)
 })
