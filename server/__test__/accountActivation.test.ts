@@ -72,30 +72,25 @@ it("should return 404 status if no user is found", async () => {
   expect(statusCode).toBe(404);
 });
 
-
-it("should return 202 status if user updated", async() => {
+it("should return 202 status if user updated", async () => {
   // @ts-ignore
   vi.spyOn(UserService, "activateUser")
     // @ts-ignore
-    .mockReturnValueOnce(Promise.resolve({...userPayload}));
+    .mockReturnValueOnce(Promise.resolve({ ...userPayload }));
 
+  const { statusCode } = await request(app).get(ROUTE_ACTIVATE);
 
-  const { statusCode} = await request(app).get(ROUTE_ACTIVATE);
-
-
-  expect(statusCode).toBe(202)
+  expect(statusCode).toBe(202);
 });
 
-it("should return activation token of '' and status of 1 if update succeded", async() => {
+it("should return activation token of '' and status of 1 if update succeded", async () => {
   // @ts-ignore
   vi.spyOn(UserService, "activateUser")
     // @ts-ignore
-    .mockReturnValueOnce(Promise.resolve({...userPayload}));
+    .mockReturnValueOnce(Promise.resolve({ ...userPayload }));
 
+  const { body } = await request(app).get(ROUTE_ACTIVATE);
 
-  const {  body } = await request(app).get(ROUTE_ACTIVATE);
-
-
-  expect(body.activationToken).toBe('');
+  expect(body.activationToken).toBe("");
   expect(body.status).toBe(1);
-})
+});
