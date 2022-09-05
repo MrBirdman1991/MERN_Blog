@@ -1,17 +1,16 @@
 import "dotenv/config";
 import { it, expect, beforeAll, afterAll, afterEach } from "vitest";
-import { createServer } from "../../../src/utils/server";
 import db from "../../config/database";
 
 import { createUser } from "../../../src/services/user.service";
 
 
-const app = createServer();
+
 beforeAll(() => {
   db.connect();
 });
 
-afterEach(async () => {
+afterEach(() => {
   db.reset();
 });
 

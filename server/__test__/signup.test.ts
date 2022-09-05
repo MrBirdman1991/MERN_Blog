@@ -20,7 +20,7 @@ describe("given the user input exist", () => {
       password: "4forGlesa!",
     },
     clientIp: "::ffff:127.0.0.1",
-    get: (x: string) => "PostmanRuntime/7.29.2",
+    get: (_x: string) => "PostmanRuntime/7.29.2",
   };
 
   const userId = new mongoose.Types.ObjectId().toString();

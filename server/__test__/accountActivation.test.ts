@@ -41,15 +41,15 @@ const next = vi.fn();
 const ROUTE_ACTIVATE = `/api/user/1.0/activate/${req.params.token}`;
 
 it("should call activateUser with url param once", async () => {
-  const findUserServiceMock = vi
+  const activateUserServiceMock = vi
     .spyOn(UserService, "activateUser")
     .mockReturnValueOnce(Promise.resolve({ ...userPayload }));
 
   // @ts-ignore
   await activateUserHandler(req, res, next);
 
-  expect(findUserServiceMock).toBeCalledTimes(1);
-  expect(findUserServiceMock).toHaveBeenCalledWith(req.params.token);
+  expect(activateUserServiceMock).toBeCalledTimes(1);
+  expect(activateUserServiceMock).toHaveBeenCalledWith(req.params.token);
 });
 
 it("should throw 500 status if activateUser throws", async () => {
@@ -80,7 +80,7 @@ it("should return 202 status if user updated", async() => {
     .mockReturnValueOnce(Promise.resolve({...userPayload}));
 
 
-  const { statusCode, body } = await request(app).get(ROUTE_ACTIVATE);
+  const { statusCode} = await request(app).get(ROUTE_ACTIVATE);
 
 
   expect(statusCode).toBe(202)
