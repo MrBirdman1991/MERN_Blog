@@ -23,6 +23,7 @@ export interface UserDocument extends Omit<UserInput, "ip">, Document {
   activationToken: string;
   createdAt: Date;
   updatedAt: Date;
+  matchPasswords: (password: UserInput["password"]) => boolean;
 }
 
 const userSchema = new Schema(
@@ -67,6 +68,12 @@ userSchema.pre("save", async function (next) {
 
   next();
 });
+
+
+userSchema.methods.matchPasswords = async function (password: UserInput["password"]) {
+  const user = this;
+  return await bcrypt.compare(password, user.password);
+}
 
 const UserModel = mongoose.model<UserDocument>("User", userSchema);
 
