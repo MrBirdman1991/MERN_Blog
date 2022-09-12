@@ -2,9 +2,9 @@ import { it, expect, vi, afterEach } from "vitest";
 import request from "supertest";
 import mongoose from "mongoose";
 
-import { createServer } from "../src/utils/server";
-import * as UserService from "../src/services/user.service";
-import { activateUserHandler } from "../src/controllers/user.controller";
+import { createServer } from "../../src/utils/server";
+import * as UserService from "../../src/services/user.service";
+import { activateUserHandler } from "../../src/controllers/user.controller";
 
 const app = createServer();
 afterEach(() => {
@@ -43,6 +43,7 @@ const ROUTE_ACTIVATE = `/api/user/1.0/activate/${req.params.token}`;
 it("should call activateUser with url param once", async () => {
   const activateUserServiceMock = vi
     .spyOn(UserService, "activateUser")
+     // @ts-ignore
     .mockReturnValueOnce(Promise.resolve({ ...userPayload }));
 
   // @ts-ignore

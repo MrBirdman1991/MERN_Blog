@@ -2,9 +2,9 @@ import { describe, it, expect, vi, afterEach } from "vitest";
 import request from "supertest";
 import mongoose from "mongoose";
 
-import { createServer } from "../src/utils/server";
-import * as UserService from "../src/services/user.service";
-import { signUpHandler } from "../src/controllers/user.controller";
+import { createServer } from "../../src/utils/server";
+import * as UserService from "../../src/services/user.service";
+import { signUpHandler } from "../../src/controllers/user.controller";
 
 const ROUTE_SIGNUP = "/api/user/1.0/signup";
 const app = createServer();

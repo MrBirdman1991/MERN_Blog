@@ -1,4 +1,4 @@
-import { createUser, findUser, activateUser } from "../services/user.service";
+import { createUser, findUser, activateUser, getUsers } from "../services/user.service";
 import { withErrorHandler } from "../utils/withErrorHandler";
 
 export const signUpHandler = withErrorHandler( async (req, res, next) => {
@@ -38,4 +38,14 @@ export const loginUserHandler = withErrorHandler(async (req, res, next) => {
 
 
     res.status(202).json(existingUser)
+})
+
+export const getUsersHandler = withErrorHandler(async (req, res, next) => {
+    const pageQuery = res.locals.page as number;
+    const users = await getUsers(pageQuery);
+
+    if(!users) return res.status(404).json("no users found")
+
+
+    res.json(users)
 })
