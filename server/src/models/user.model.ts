@@ -58,13 +58,13 @@ userSchema.pre("save", async function (next) {
   const activationToken = crypto.randomBytes(64).toString("hex");
   user.activationToken = activationToken;
 
-  const url = `${process.env.CLIENT_URI}/${user.activationToken}`;
-  await transporter.sendMail({
-    from: '"Fred Foo 👻" <foo@example.com>',
-    to: user.email,
-    subject: "Blog registration",
-    html: `Bitte auf confirm klicken <a href="${url}">confirm</<a>`,
-  });
+  //const url = `${process.env.CLIENT_URI}/${user.activationToken}`;
+  //await transporter.sendMail({
+  //  from: '"Fred Foo 👻" <foo@example.com>',
+  //  to: user.email,
+  //  subject: "Blog registration",
+  //  html: `Bitte auf confirm klicken <a href="${url}">confirm</<a>`,
+  //});
 
   next();
 });

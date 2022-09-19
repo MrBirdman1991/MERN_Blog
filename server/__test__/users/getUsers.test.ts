@@ -60,3 +60,13 @@ it("should return getUsersPayload and 200 response if users found in db", async 
   expect(statusCode).toBe(200);
   expect(body).toEqual(getUsersPayload)
 });
+
+
+it("should throw 500 status if  getUsers throws", async () => {
+  //@ts-ignore
+  vi.spyOn(UserService, "getUsers").mockRejectedValueOnce("unknown Error");
+
+  const { statusCode } = await request(app).get(ROUTE_USERS).send();
+
+  expect(statusCode).toBe(500);
+});
