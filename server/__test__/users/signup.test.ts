@@ -23,6 +23,13 @@ describe("given the user input is correct", () => {
     get: (_x: string) => "PostmanRuntime/7.29.2",
   };
 
+  const res = {
+    status: vi.fn(() => {
+      return { json: vi.fn() };
+    }),
+  };
+  const next = vi.fn();
+
   const userId = new mongoose.Types.ObjectId().toString();
   const userPayload = {
     _id: userId,
@@ -38,12 +45,7 @@ describe("given the user input is correct", () => {
     __v: 0,
   };
 
-  const res = {
-    status: vi.fn(() => {
-      return { json: vi.fn() };
-    }),
-  };
-  const next = vi.fn();
+
 
   it("should call findUser service with email param once", async () => {
     const findUserServiceMock = vi

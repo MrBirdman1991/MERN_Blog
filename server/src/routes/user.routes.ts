@@ -25,7 +25,7 @@ router.get("/activate/:token", activateUserHandler);
 //@route    POST /api/user/1.0/login
 //@desc     logs user in
 //@access   Public
-router.post("/login", loginUserHandler);
+router.post("/login",validate(validateUser), loginUserHandler);
 
 //@route    GET /api/user/1.0/users
 //@desc     returns back a list of users by pagination

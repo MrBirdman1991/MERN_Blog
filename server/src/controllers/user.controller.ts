@@ -29,10 +29,10 @@ export const loginUserHandler = withErrorHandler(async (req, res, next) => {
     const {email, password} = req.body;
 
     const existingUser = await findUser({email});
-    if(!existingUser) return res.status(422).json("no user found");
+    if(!existingUser || !existingUser.status) return res.status(401).json("no user found");
 
    const isMatching = await existingUser.matchPasswords(password);
-   if(!isMatching) return res.status(422).json("no correct password");
+   if(!isMatching) return res.status(401).json("no correct password");
 
 
 
