@@ -4,6 +4,7 @@ import {
   activateUserHandler,
   loginUserHandler,
   getUsersHandler,
+  getUserHandler
 } from "../controllers/user.controller";
 import { pagination } from "../middlewares/pagination";
 import validate from "../middlewares/validateResource";
@@ -30,5 +31,10 @@ router.post("/login", loginUserHandler);
 //@desc     returns back a list of users by pagination
 //@access   Public
 router.get("/users", pagination, getUsersHandler);
+
+//@route    GET /api/user/1.0/users/:id
+//@desc     returns back an user by id
+//@access   Public
+router.get("/users/:id", getUserHandler);
 
 export default router;

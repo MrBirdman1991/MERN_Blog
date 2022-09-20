@@ -18,6 +18,14 @@ export async function findUser(query: FilterQuery<UserDocument> = {}) {
   return user;
 }
 
+export async function findUserById(id: string){
+  const user = await User.findById(id);
+
+  if(!id || !user) return false;
+
+  return user;
+}
+
 export async function activateUser(token: string) {
   const updatedUser = await User.findOneAndUpdate(
     { activationToken: token },

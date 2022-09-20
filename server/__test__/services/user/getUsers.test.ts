@@ -98,3 +98,10 @@ it("should filter the users by Date", async () => {
   expect(users.content[0].email).toBe(createdUserTwo.email)
 });
 
+it("should return false if no user is is found by page", async () => {
+  await addUsers(1);  
+
+  const users = await getUsers(65);
+  // @ts-ignore
+  expect(users).toBe(false)
+});

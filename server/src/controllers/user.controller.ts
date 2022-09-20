@@ -1,4 +1,4 @@
-import { createUser, findUser, activateUser, getUsers } from "../services/user.service";
+import { createUser, findUser, activateUser, getUsers, findUserById } from "../services/user.service";
 import { withErrorHandler } from "../utils/withErrorHandler";
 
 export const signUpHandler = withErrorHandler( async (req, res, next) => {
@@ -48,4 +48,14 @@ export const getUsersHandler = withErrorHandler(async (req, res, next) => {
 
 
     res.json(users)
+})
+
+export const getUserHandler = withErrorHandler(async (req, res, next) => {
+    const userId = req.params.id;
+
+    const existingUser = await findUserById(userId);
+    if(!existingUser) return res.status(404).json("no users found");
+
+
+    res.json(existingUser);
 })

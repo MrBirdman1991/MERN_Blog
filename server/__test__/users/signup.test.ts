@@ -13,7 +13,7 @@ afterEach(() => {
   vi.clearAllMocks();
 });
 
-describe("given the user input exist", () => {
+describe("given the user input is correct", () => {
   const req = {
     body: {
       email: "julian.vogel@web.de",
@@ -130,7 +130,7 @@ describe("given the user input exist", () => {
   });
 });
 
-describe("given the user input doesn't exist", () => {
+describe("given the user input isn't correct", () => {
   describe.each([
     ["email", "", "not valid email"],
     ["email", "stanweb.de", "not valid email"],

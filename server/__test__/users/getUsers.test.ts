@@ -1,10 +1,14 @@
-import { describe, it, expect, vi, afterEach } from "vitest";
+import { it, expect, vi, afterEach } from "vitest";
 import { getUsersHandler } from "../../src/controllers/user.controller";
 import * as UserService from "../../src/services/user.service";
 import { createServer } from "../../src/utils/server";
 import request from "supertest";
 
 const app = createServer();
+
+afterEach(() => {
+  vi.clearAllMocks();
+});
 
 const req = {
   body: {},
