@@ -2,6 +2,7 @@ import { describe, it, expect, vi, afterEach } from "vitest";
 import request from "supertest";
 import mongoose from "mongoose";
 import * as UserService from "../../src/services/user.service";
+import * as HashUtils from "../../src/utils/hash";
 import { createServer } from "../../src/utils/server";
 import { loginUserHandler } from "../../src/controllers/user.controller";
 
@@ -44,7 +45,121 @@ const userPayload = {
 };
 
 describe("given the user input is correct", () => {
-  it("test", () => {})
+  it("should call findUser with email param once", async () => {
+    const findeUserServiceMock = vi
+      .spyOn(UserService, "findUser")
+      // @ts-ignore
+      .mockReturnValueOnce(Promise.resolve(userPayload));
+
+    // @ts-ignore
+    await loginUserHandler(req, res, next);
+
+    expect(findeUserServiceMock).toBeCalledTimes(1);
+    expect(findeUserServiceMock).toBeCalledWith({ email: req.body.email });
+  });
+
+  it("should throw 500 status if findUser throws", async () => {
+    vi.spyOn(UserService, "findUser")
+      // @ts-ignore
+      .mockRejectedValueOnce("unknown Error");
+
+    // @ts-ignore
+    const { statusCode } = await request(app)
+      .post(ROUTE_LOGIN)
+      .send({ ...req.body });
+
+    expect(statusCode).toBe(500);
+  });
+
+  it("should throw 401 status if user not exists", async () => {
+    vi.spyOn(UserService, "findUser")
+      // @ts-ignore
+      .mockReturnValueOnce(Promise.resolve(false));
+
+    // @ts-ignore
+    const { statusCode } = await request(app)
+      .post(ROUTE_LOGIN)
+      .send({ ...req.body });
+
+    expect(statusCode).toBe(401);
+  });
+
+  it("should throw 401 status if user status is not 1", async () => {
+    vi.spyOn(UserService, "findUser")
+      // @ts-ignore
+      .mockReturnValueOnce(Promise.resolve(userPayload));
+
+    // @ts-ignore
+    const { statusCode } = await request(app)
+      .post(ROUTE_LOGIN)
+      .send({ ...req.body });
+
+    expect(statusCode).toBe(401);
+  });
+
+  it("should throw 401 if user activationToken length is not 0", async () => {
+    vi.spyOn(UserService, "findUser")
+      // @ts-ignore
+      .mockReturnValueOnce(Promise.resolve({ ...userPayload, status: 1 }));
+
+    const { statusCode } = await request(app)
+      .post(ROUTE_LOGIN)
+      .send({ ...req.body });
+
+    expect(statusCode).toBe(401);
+  });
+
+  it("should call comparedPassword with password and db password once", async () => {
+    // @ts-ignore
+    UserService.findUser.mockImplementationOnce(() =>
+      Promise.resolve({ ...userPayload, status: 1, activationToken: "" })
+    );
+    const comparedPasswordMock = vi
+      .spyOn(HashUtils, "comparedPassword")
+      .mockReturnValueOnce(Promise.resolve(true));
+
+    // @ts-ignore
+    await loginUserHandler(req, res, next);
+
+    expect(comparedPasswordMock).toBeCalledTimes(1);
+    expect(comparedPasswordMock).toBeCalledWith(
+      req.body.password,
+      userPayload.password
+    );
+  });
+
+  it("should return 401 status if passwords are not correct", async () => {
+    vi.spyOn(UserService, "findUser")
+      // @ts-ignore
+      .mockReturnValueOnce(Promise.resolve({ ...userPayload, status: 1 , activationToken: "" }));
+
+    vi
+      .spyOn(HashUtils, "comparedPassword")
+      .mockReturnValueOnce(Promise.resolve(false));
+
+    const { statusCode } = await request(app)
+      .post(ROUTE_LOGIN)
+      .send({ ...req.body });
+
+    expect(statusCode).toBe(401);
+  });
+
+  it("should return 202 status if user is correct", async () => {
+    vi.spyOn(UserService, "findUser")
+      // @ts-ignore
+      .mockReturnValueOnce(Promise.resolve({ ...userPayload, status: 1, activationToken: ""  }));
+
+    vi
+      .spyOn(HashUtils, "comparedPassword")
+      .mockReturnValueOnce(Promise.resolve(true));
+
+    const { statusCode } = await request(app)
+      .post(ROUTE_LOGIN)
+      .send({ ...req.body });
+
+    expect(statusCode).toBe(202);
+  });
+  
 });
 
 describe("given the user input isn't correct", () => {
