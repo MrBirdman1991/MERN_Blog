@@ -1,7 +1,4 @@
 import mongoose, { Schema, Document } from "mongoose";
-import bcrypt from "bcrypt";
-import crypto from "crypto";
-import createTransporter from "../utils/mailerTransporter";
 
 export enum UserStatus {
   inactive = 0,
@@ -23,7 +20,6 @@ export interface UserDocument extends Omit<UserInput, "ip">, Document {
   activationToken: string;
   createdAt: Date;
   updatedAt: Date;
-  matchPasswords: (password: UserInput["password"]) => boolean;
 }
 
 const userSchema = new Schema(
@@ -39,41 +35,6 @@ const userSchema = new Schema(
     timestamps: true,
   }
 );
-
-userSchema.pre("save", async function (next) {
-  const user = this;
-
-  const transporter = createTransporter({
-    // @ts-ignore
-    service: process.env.Mailer_SERVICE,
-    auth: {
-      user: process.env.Mailer_USER,
-      pass: process.env.Mailer_PASS,
-    },
-  });
-
-  const salt = await bcrypt.genSalt(12);
-  user.password = await bcrypt.hash(user.password, salt);
-
-  const activationToken = crypto.randomBytes(64).toString("hex");
-  user.activationToken = activationToken;
-
-  //const url = `${process.env.CLIENT_URI}/${user.activationToken}`;
-  //await transporter.sendMail({
-  //  from: '"Fred Foo 👻" <foo@example.com>',
-  //  to: user.email,
-  //  subject: "Blog registration",
-  //  html: `Bitte auf confirm klicken <a href="${url}">confirm</<a>`,
-  //});
-
-  next();
-});
-
-
-userSchema.methods.matchPasswords = async function (password: UserInput["password"]) {
-  const user = this;
-  return await bcrypt.compare(password, user.password);
-}
 
 const UserModel = mongoose.model<UserDocument>("User", userSchema);
 

@@ -27,13 +27,8 @@ export const activateUserHandler = withErrorHandler(async (req, res, next) => {
 
 export const loginUserHandler = withErrorHandler(async (req, res, next) => {
     const {email, password} = req.body;
-
     const existingUser = await findUser({email});
     if(!existingUser || !existingUser.status) return res.status(401).json("no user found");
-
-   const isMatching = await existingUser.matchPasswords(password);
-   if(!isMatching) return res.status(401).json("no correct password");
-
 
 
 

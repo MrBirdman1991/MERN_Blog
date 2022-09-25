@@ -1,14 +1,31 @@
 import User, { UserInput, UserDocument } from "../models/user.model";
 import { FilterQuery } from "mongoose";
 import { UserStatus } from "../models/user.model";
+import { Mailer } from "../utils/mailerTransporter";
+import { hashPassword } from "../utils/hash";
+import crypto from "crypto";
 
 export const createUser = async (userData: UserInput) => {
-  return await User.create({
-    email: userData.email,
-    password: userData.password,
-    userAgent: userData.userAgent,
-    ips: [userData.clientIp],
-  });
+ 
+ 
+  const hashedPassword = await hashPassword(userData.password);
+
+  const activationToken = crypto.randomBytes(64).toString("hex");
+  
+  const user = new User({...userData, password: hashedPassword, activationToken, ips:[userData.clientIp]});
+  await user.save();
+
+  const transporter = Mailer.getInstance();
+  const url = `${process.env.CLIENT_URI}/${activationToken}`;
+ //await transporter.sendMail({
+ //  from: '"Fred Foo 👻" <foo@example.com>',
+ //  to: user.email,
+ //  subject: "Blog registration",
+ //  html: `Bitte auf confirm klicken <a href="${url}">confirm</<a>`,
+ //});
+
+
+  return user;
 };
 
 export async function findUser(query: FilterQuery<UserDocument> = {}) {
