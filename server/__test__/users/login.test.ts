@@ -129,9 +129,10 @@ describe("given the user input is correct", () => {
   });
 
   it("should return 401 status if passwords are not correct", async () => {
-    vi.spyOn(UserService, "findUser")
-      // @ts-ignore
-      .mockReturnValueOnce(Promise.resolve({ ...userPayload, status: 1 , activationToken: "" }));
+    // @ts-ignore
+    UserService.findUser.mockImplementationOnce(() =>
+    Promise.resolve({ ...userPayload, status: 1, activationToken: "" })
+  );
 
     vi
       .spyOn(HashUtils, "comparedPassword")
@@ -145,9 +146,10 @@ describe("given the user input is correct", () => {
   });
 
   it("should return 202 status if user is correct", async () => {
-    vi.spyOn(UserService, "findUser")
-      // @ts-ignore
-      .mockReturnValueOnce(Promise.resolve({ ...userPayload, status: 1, activationToken: ""  }));
+    // @ts-ignore
+    UserService.findUser.mockImplementationOnce(() =>
+    Promise.resolve({ ...userPayload, status: 1, activationToken: "" })
+  );
 
     vi
       .spyOn(HashUtils, "comparedPassword")
