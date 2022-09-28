@@ -1,7 +1,7 @@
 import "dotenv/config";
-import { it, expect, beforeAll, afterAll, afterEach } from "vitest";
+import { it, expect, beforeAll, afterAll, afterEach, vi } from "vitest";
 import db from "../../config/database";
-
+import {SMTPServer} from "smtp-server";
 import { createUser } from "../../../src/services/user.service";
 
 
@@ -12,6 +12,7 @@ beforeAll(() => {
 
 afterEach(() => {
   db.reset();
+  vi.clearAllMocks();
 });
 
 afterAll(() => {
@@ -66,4 +67,30 @@ const userInput = {
     const createdUser = await createUser({ ...userInput });
   
     expect(createdUser.activationToken).toBeTruthy();
+  })
+
+  it("should send an email with activationToken", async() => {
+    let lastMail: string;
+
+    const server = new SMTPServer({
+      authOptional: true,
+      onData(stream, session, callback){
+        let mailBody: string;
+
+        stream.on("data", (data) => {
+          mailBody += data.toString();
+        })
+        stream.on("end", () => {
+          lastMail = mailBody;
+          console.log(mailBody)
+          callback();
+        })
+      }
+    })
+
+    await server.listen(8587, "localhost");
+
+    await createUser({...userInput});
+
+    await server.close();
   })

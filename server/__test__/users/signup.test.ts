@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 
 import { createServer } from "../../src/utils/server";
 import * as UserService from "../../src/services/user.service";
+import * as EmailService from "../../src/services/email.service"
 import { signUpHandler } from "../../src/controllers/user.controller";
 
 const ROUTE_SIGNUP = "/api/user/1.0/signup";

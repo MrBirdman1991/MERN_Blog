@@ -1,3 +1,4 @@
+import { sendAccountActivation } from "../services/email.service";
 import {
   createUser,
   findUser,
@@ -22,6 +23,10 @@ export const signUpHandler = withErrorHandler(async (req, res, next) => {
     userAgent,
     clientIp,
   });
+
+  if(createdUser){
+    await sendAccountActivation(email, createdUser.activationToken)
+  }
 
   res.status(201).json(createdUser);
 });

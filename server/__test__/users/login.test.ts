@@ -131,12 +131,12 @@ describe("given the user input is correct", () => {
   it("should return 401 status if passwords are not correct", async () => {
     // @ts-ignore
     UserService.findUser.mockImplementationOnce(() =>
-    Promise.resolve({ ...userPayload, status: 1, activationToken: "" })
-  );
+      Promise.resolve({ ...userPayload, status: 1, activationToken: "" })
+    );
 
-    vi
-      .spyOn(HashUtils, "comparedPassword")
-      .mockReturnValueOnce(Promise.resolve(false));
+    vi.spyOn(HashUtils, "comparedPassword").mockReturnValueOnce(
+      Promise.resolve(false)
+    );
 
     const { statusCode } = await request(app)
       .post(ROUTE_LOGIN)
@@ -148,12 +148,12 @@ describe("given the user input is correct", () => {
   it("should return 202 status if user is correct", async () => {
     // @ts-ignore
     UserService.findUser.mockImplementationOnce(() =>
-    Promise.resolve({ ...userPayload, status: 1, activationToken: "" })
-  );
+      Promise.resolve({ ...userPayload, status: 1, activationToken: "" })
+    );
 
-    vi
-      .spyOn(HashUtils, "comparedPassword")
-      .mockReturnValueOnce(Promise.resolve(true));
+    vi.spyOn(HashUtils, "comparedPassword").mockReturnValueOnce(
+      Promise.resolve(true)
+    );
 
     const { statusCode } = await request(app)
       .post(ROUTE_LOGIN)
@@ -161,7 +161,6 @@ describe("given the user input is correct", () => {
 
     expect(statusCode).toBe(202);
   });
-  
 });
 
 describe("given the user input isn't correct", () => {
